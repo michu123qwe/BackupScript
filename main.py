@@ -1,67 +1,114 @@
 import os
 import filecmp
-from termcolor import colored
+import datetime
 
-class Colors:
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
+# list with new files. Format: [new_file_path, backup_file_path]
+new = []
+
+# list with existing, but different files to be overwritten. Format:  [new_file_path, backup_file_path]
+different = []
+
+# list with old version directories to be created. Format: directory_path
+directory = []
+
+# list with old versions of file to be moved. Format: [old_file_path, old_version_file_path]
+move = []
 
 
-def tabprint(s, tab, color):
-    print(colored("{}{}".format("-"*tab*2, s), color))
+# fill new, different, directory, move lists
+def list_backup(backup_path, new_path):
 
-
-def make_backup(backup_path, new_path, tab=1):
+    # list of files in backup directory
     backup_files = os.listdir(backup_path)
+    # list of files in new directory
     new_files = os.listdir(new_path)
 
-    # print(new_files)
-    new = []
-    different = []
-    exact = []
-
+    # look at every file
     for file in new_files:
-        if file not in backup_files:
-            # tabprint("new file {}{}".format(file, Colors.WARNING), tab, 'red')
-            new.append(os.path.join(new_path, file))
+
+        # don't add hidden directories
+        if file[0] == '.':
             continue
 
+        # paths for current file
+        new_file_path = os.path.join(new_path, file)
+        backup_file_path = os.path.join(backup_path, file)
+
+        # don't add current backup folder
+        if new_file_path == backup_path:
+            continue
+
+        # new file
+        if file not in backup_files:
+
+            # add new file
+            new.append([new_file_path, backup_file_path])
+
+        # existing file
         else:
-            if filecmp.cmp(
-                    os.path.join(backup_path, file),
-                    os.path.join(new_path, file)):
-                # tabprint("two exact files {}{}".format(file, Colors.OKGREEN), tab, 'green')
-                exact.append(os.path.join(new_path, file))
-                pass
-            else:
-                if os.path.isdir(os.path.join(new_path, file)):
-                    # tabprint("folder {}:".format(file), tab, 'white')
-                    make_backup(os.path.join(backup_path, file), os.path.join(new_path, file), tab + 1)
+
+            # check if files aren't the same
+            if not filecmp.cmp(backup_file_path, new_file_path):
+
+                # check if file is a directory
+                if os.path.isdir(new_file_path):
+
+                    # call function for directory
+                    list_backup(backup_file_path, new_file_path)
+
                 else:
-                    # tabprint("two different files {}".format(file), tab, 'red')
-                    different.append(os.path.join(new_path, file))
+                    # directory name for old version of current file
+                    oldversion_directory_name = "oldversion {}".format(file)
 
-    if len(new) or len(different) or len(exact):
-        print()
-        print("Folder: {}".format(new_path))
-        if len(new):
-            print()
-            for file in new:
-                print(colored("new file: {}".format(file), 'red'))
+                    # add old version directory if it doesn't exist
+                    if oldversion_directory_name not in backup_files:
+                        directory.append(os.path.join(backup_path, oldversion_directory_name))
 
-        if len(different):
-            print()
-            for file in different:
-                print(colored("different file: {}".format(file), 'red'))
+                    # file name for old version of current file
+                    date = str(datetime.datetime.now()).replace(' ', '-')
+                    oldversion_file_name = "{}{}".format(date, file)
 
-        if len(exact):
-            print()
-            for file in exact:
-                print(colored("exact file: {}".format(file), 'green'))
+                    # move old file to old version folder
+                    move.append(
+                        [backup_file_path,
+                         os.path.join(backup_path, oldversion_directory_name, oldversion_file_name)])
+
+                    # replace existing file
+                    different.append([new_file_path, backup_file_path])
 
 
 BACKUPPATH = 'backup/'
 NEWPATH = 'new/'
 
-make_backup(BACKUPPATH, NEWPATH)
+list_backup(BACKUPPATH, NEWPATH)
+
+if len(new) > 0:
+    print("New files:")
+    for paths in new:
+        print("{} -> {}".format(paths[0], paths[1]))
+
+print()
+
+if len(directory) > 0:
+    print("Folders for old versions:")
+    for path in directory:
+        print("Create {}".format(path))
+
+print()
+
+if len(move) > 0:
+    print("Move old versions:")
+    for paths in move:
+        print("{} -> {}".format(paths[0], paths[1]))
+
+print()
+
+if len(different) > 0:
+    print("Different files:")
+    for paths in different:
+        print("{} -> {}".format(paths[0], paths[1]))
+
+
+
+
+
