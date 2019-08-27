@@ -1,6 +1,27 @@
 import os
+import shutil
 import filecmp
 import datetime
+
+
+# print how many bytes of data is to be copied/moved
+def print_backup_state(current_size, final_size):
+    current = current_size
+    final = final_size
+    size_type = "B"
+    if final_size >= 1000:
+        current = current_size/1000
+        final = final_size/1000
+        size_type = "KB"
+    elif final_size >= 1000000:
+        current = current_size/1000000
+        final = final_size/1000000
+        size_type = "MB"
+    elif final_size >= 1000000000:
+        current = current_size/1000000000
+        final = final_size/1000000000
+        size_type = "GB"
+    print("{}{} of {}{}  ({:.2f}%)".format(current, size_type, final, size_type, (current/final)*100))
 
 
 # fill:
@@ -86,3 +107,47 @@ def list_backup(backup_path, new_path, new=None, different=None, directory=None,
 
     if main:
         return new, different, move, directory
+
+
+def make_backup(new, different, directory, move):
+
+    all_size = 0
+    for paths in new:
+        all_size += paths[2]
+    for paths in different:
+        all_size += paths[2]
+    for paths in move:
+        all_size += paths[2]
+
+    curr_size = 0
+
+    # create old version directories
+    for file in directory:
+        os.mkdir(file)
+
+    # move old version files
+    for paths in move:
+        curr_size += paths[2]
+        print_backup_state(curr_size, all_size)
+        os.rename(paths[0], paths[1])
+
+    # move new and different files to backup folder
+    for paths in new:
+        curr_size += paths[2]
+        print_backup_state(curr_size, all_size)
+        try:
+            if os.path.isdir(paths[0]):
+                shutil.copytree(paths[0], paths[1])
+            else:
+                shutil.copy(paths[0], paths[1])
+        except:
+            print("Problem with file: {}. Skipped.".format(paths[0]))
+            continue
+    for paths in different:
+        curr_size += paths[2]
+        print_backup_state(curr_size, all_size)
+        try:
+            shutil.copy(paths[0], paths[1])
+        except:
+            print("Problem with file: {}. Skipped.".format(paths[0]))
+            continue

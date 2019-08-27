@@ -45,7 +45,7 @@ if len(files_different) > 0:
 
 ans = input("\nProceed?(y/n) ")
 if ans.lower() == "y":
-    pass
+    backup.make_backup(files_new, files_different, files_directory, files_move)
 else:
     print("Goodbye")
     quit()
