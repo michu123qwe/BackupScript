@@ -2,6 +2,7 @@ import os
 import shutil
 import filecmp
 import datetime
+import utils.utils as utils
 
 
 # print how many bytes of data is to be copied/moved
@@ -68,7 +69,11 @@ def list_backup(backup_path, new_path, new=None, different=None, directory=None,
         if file not in backup_files:
 
             # add new file
-            size = os.path.getsize(new_file_path)
+            if os.path.isdir(new_file_path):
+                size = utils.get_directory_size(new_file_path)
+            else:
+                size = os.path.getsize(new_file_path)
+
             new.append([new_file_path, backup_file_path, size])
 
         # existing file
