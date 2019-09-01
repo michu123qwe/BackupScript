@@ -5,26 +5,6 @@ import datetime
 import utils.utils as utils
 
 
-# print how many bytes of data is to be copied/moved
-def print_backup_state(current_size, final_size):
-    current = current_size
-    final = final_size
-    size_type = "B"
-    if final_size >= 1000:
-        current = current_size/1000
-        final = final_size/1000
-        size_type = "KB"
-    elif final_size >= 1000000:
-        current = current_size/1000000
-        final = final_size/1000000
-        size_type = "MB"
-    elif final_size >= 1000000000:
-        current = current_size/1000000000
-        final = final_size/1000000000
-        size_type = "GB"
-    print("{}{} of {}{}  ({:.2f}%)".format(current, size_type, final, size_type, (current/final)*100))
-
-
 # fill:
 # list with new files. Format: [[new_file_path, backup_file_path, size_in_bytes]],
 # list with existing files to be overwritten. Format:  [[new_file_path, backup_file_path, size_in_bytes]],
@@ -132,27 +112,34 @@ def make_backup(new, different, directory, move):
 
     # move old version files
     for paths in move:
-        curr_size += paths[2]
-        print_backup_state(curr_size, all_size)
         os.rename(paths[0], paths[1])
+        curr_size += paths[2]
+        utils.print_size_state(curr_size, all_size)
 
     # move new and different files to backup folder
     for paths in new:
-        curr_size += paths[2]
-        print_backup_state(curr_size, all_size)
+
         try:
             if os.path.isdir(paths[0]):
                 shutil.copytree(paths[0], paths[1])
             else:
                 shutil.copy(paths[0], paths[1])
+
+            curr_size += paths[2]
+            utils.print_size_state(curr_size, all_size)
         except:
             print("Problem with file: {}. Skipped.".format(paths[0]))
+            curr_size += paths[2]
+            utils.print_size_state(curr_size, all_size)
             continue
+
     for paths in different:
-        curr_size += paths[2]
-        print_backup_state(curr_size, all_size)
         try:
             shutil.copy(paths[0], paths[1])
+            curr_size += paths[2]
+            utils.print_size_state(curr_size, all_size)
         except:
             print("Problem with file: {}. Skipped.".format(paths[0]))
+            curr_size += paths[2]
+            utils.print_size_state(curr_size, all_size)
             continue
