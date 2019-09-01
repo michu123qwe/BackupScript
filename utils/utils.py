@@ -1,4 +1,5 @@
 import os
+from termcolor import colored
 
 
 # return string with formatted size(B, KB, MB, GB)
@@ -27,7 +28,9 @@ def print_files_list(files_list):
     files_weight = 0
     for paths in files_list:
         files_weight += paths[2]
-        print("{} -> {} ({})".format(paths[0], paths[1], format_size(paths[2])))
+        print("{} -> {} ({})".format(colored(paths[0], 'yellow'), colored(paths[1], 'green'),
+                                     format_size(paths[2])))
+        print()
 
     print("Weight of files: {}".format(format_size(files_weight)))
 
