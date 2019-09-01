@@ -70,7 +70,7 @@ def list_backup(backup_path, new_path, new=None, different=None, directory=None,
 
                 else:
                     # directory name for old version of current file
-                    oldversion_directory_name = "oldversion_{}".format(file)
+                    oldversion_directory_name = "_oldversion_{}".format(file)
 
                     # add old version directory if it doesn't exist
                     if oldversion_directory_name not in backup_files:
