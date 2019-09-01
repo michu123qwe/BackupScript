@@ -1,10 +1,16 @@
 import os
 import backup
 import utils.utils as utils
+import argparse
 
 
-BACKUPPATH = '/home/michal/backup'
-NEWPATH = '/home/michal'
+parser = argparse.ArgumentParser()
+parser.add_argument("backup_folder", type=str, help="Folder with backup files")
+parser.add_argument("new_folder", type=str, help="Folder with files to be backed up")
+args = parser.parse_args()
+
+BACKUPPATH = args.backup_folder
+NEWPATH = args.new_folder
 
 # try to open backup folder
 if not os.path.isdir(BACKUPPATH):
@@ -20,27 +26,26 @@ if not os.path.isdir(NEWPATH):
 
 files_new, files_different, files_move, files_directory = backup.list_backup(BACKUPPATH, NEWPATH)
 
+if len(files_new) + len(files_directory) + len(files_move) + len(files_different) == 0:
+    print("Backup folder is up to date.")
+    input("Click enter to exit...")
+    quit()
+
 if len(files_new) > 0:
-    print("New files:")
+    print("\nNew files:")
     utils.print_files_list(files_new)
 
-print()
-
 if len(files_directory) > 0:
-    print("Folders for old versions:")
+    print("\nFolders for old versions:")
     for path in files_directory:
         print("Create {}".format(path))
 
-print()
-
 if len(files_move) > 0:
-    print("Move old versions:")
+    print("\nMove old versions:")
     utils.print_files_list(files_move)
 
-print()
-
 if len(files_different) > 0:
-    print("Different files:")
+    print("\nDifferent files:")
     utils.print_files_list(files_different)
 
 ans = input("\nProceed?(y/n) ")
