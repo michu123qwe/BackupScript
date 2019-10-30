@@ -13,4 +13,4 @@ Usage:
 4. List of files/folders to be moved/copied/created will be shown. If you accept it, type "y".
 5. Files/directories will be copied/moved/created as listed.
 
-Script is not well tested. Use at your own risk.
+**Script is not well tested. Use at your own risk.**
