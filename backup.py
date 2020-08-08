@@ -136,10 +136,3 @@ def backup_directory(original_dirpath, backup_dirpath):
             backup_directory(file_path, backup_file_path)
         else:
             backup_file(file_path, backup_file_path)
-            
-            
-if __name__ == "__main__":
-    path1 = '/home/michal/code/BackupScript/test1'
-    path2 = '/home/michal/code/BackupScript/test1des'
-    
-    backup_directory(path1, path2)
