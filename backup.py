@@ -109,8 +109,8 @@ def backup_file(original_filepath, backup_filepath):
 
 
 def backup_directory(original_dirpath, backup_dirpath):
-    """Backup all files in original_dirpath and save them in 
-    backup_dirpath preserving the same file tree. 
+    """Backup all files and directories in original_dirpath and save 
+    them in backup_dirpath preserving the same file and directory tree. 
 
     Args:
         original_dirpath (str):     path to directory to be backed up,
