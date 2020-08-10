@@ -29,7 +29,7 @@ def colored(string, color):
     
     print(colors[color], end='')
     print(string, end='')
-    print(end_color)
+    print(end_color, end='')
 
 # return string with formatted size(B, KB, MB, GB)
 def format_size(size_in_bytes):
