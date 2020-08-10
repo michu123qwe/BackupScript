@@ -99,6 +99,34 @@ def get_list_of_filepaths(dirpath):
     return files_list
 
 
+# returns list of all relative filepaths in given
+# directory and its subdirectories.
+def get_list_of_relative_filepaths(dirpath):
+    # First element is empty, because first relative path
+    # is basically path given in dirpath argument.
+    relative_dirs_stack = ['']
+    files_list = []
+    
+    while relative_dirs_stack:
+        # Pop the top of the stack with dirs.
+        current_dir = relative_dirs_stack[-1]
+        del relative_dirs_stack[-1]
+        
+        current_dirpath = os.path.join(dirpath, current_dir)
+        files_in_dir = os.listdir(current_dirpath)
+        
+        for file in files_in_dir:
+            file_relative_path = os.path.join(current_dir, file)
+            file_absolute_path = os.path.join(current_dirpath, file)
+            
+            if os.path.isdir(file_absolute_path):
+                relative_dirs_stack.append(file_relative_path)
+            else:
+                files_list.append(file_relative_path)
+        
+    return files_list
+
+
 if __name__ == "__main__":
     # Simple tests
     
