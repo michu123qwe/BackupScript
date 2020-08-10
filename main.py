@@ -1,5 +1,9 @@
-import backup
 import argparse
+import os
+
+import backup
+import utils
+import info
 
 
 def parse_arguments():
@@ -19,6 +23,9 @@ def parse_arguments():
 
 if __name__ == "__main__":
     original_path, backup_path = parse_arguments()
+    filepaths_to_backup = utils.get_list_of_filepaths(original_path)
+    
+    info.print_list_of_files_to_backup(filepaths_to_backup)
 
     ans = input("\nProceed?(y/n) ")
     if ans.lower() == "y":
