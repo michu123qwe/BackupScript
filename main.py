@@ -22,14 +22,16 @@ def parse_arguments():
 
 
 if __name__ == "__main__":
-    original_path, backup_path = parse_arguments()
-    filepaths_to_backup = utils.get_list_of_filepaths(original_path)
+    original_dirpath, backup_dirpath = parse_arguments()
+    filepaths_to_backup = utils.get_list_of_filepaths(original_dirpath)
     
     info.print_list_of_files_to_backup(filepaths_to_backup)
 
-    ans = input("\nProceed?(y/n) ")
+    info.print_proceed_info()
+    ans = input()
+    
     if ans.lower() == "y":
-        backup.backup_directory(original_path, backup_path)
+        backup.backup_directory(original_dirpath, backup_dirpath)
     else:
         print("Goodbye")
         quit()

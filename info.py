@@ -2,6 +2,13 @@ import os
 
 import utils
 
+def print_proceed_info():
+    utils.colored('\nProceed?(', 'blue')
+    utils.colored('y', 'green')
+    utils.colored('/', 'blue')
+    utils.colored('n', 'red')
+    utils.colored(') ', 'blue')
+
 
 def print_filepath_to_backup(filepath):
     size_formatted = utils.format_size(os.path.getsize(filepath))
