@@ -1,6 +1,35 @@
 import os
-from termcolor import colored
 
+
+def colored(string, color):
+    """Print string in given available color.
+    
+    Available colors are:
+        green
+        red
+        yellow
+
+    Args:
+        string (str): text to be printed,
+        color (str): color in which text will be printed.
+
+    Raises:
+        Exception: when given color is not one of the available colors.
+    """
+    
+    colors = {
+        'green': '\033[92m',
+        'red': '\033[91m',
+        'yellow': '\033[93m'
+    }
+    end_color = '\033[0m'
+    
+    if color not in colors.keys():
+        raise Exception('Exception: No such color.')
+    
+    print(colors[color], end='')
+    print(string, end='')
+    print(end_color)
 
 # return string with formatted size(B, KB, MB, GB)
 def format_size(size_in_bytes):
@@ -43,3 +72,16 @@ def get_directory_size(start_path='.'):
             fp = os.path.join(dirpath, f)
             total_size += (os.path.getsize(fp) if os.path.isfile(fp) else 0)
     return total_size
+
+
+if __name__ == "__main__":
+    # Simple tests
+    
+    colored('test', 'green')
+    colored('test', 'red')
+    colored('test', 'yellow')
+    
+    try:
+        colored('test', 'black')
+    except Exception as e:
+        print(e)
