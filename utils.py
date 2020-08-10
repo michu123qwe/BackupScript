@@ -74,6 +74,29 @@ def get_directory_size(start_path='.'):
     return total_size
 
 
+# returns list of all filepaths in given directory and its
+# subdirectories
+def get_list_of_filepaths(dirpath):
+    dirs_stack = [dirpath]
+    files_list = []
+    
+    while dirs_stack:
+        # Pop the top of the stack with dirs.
+        current_dir = dirs_stack[-1]
+        del dirs_stack[-1]
+        
+        files_in_dir = os.listdir(current_dir)
+        for file in files_in_dir:
+            file_path = os.path.join(current_dir, file)
+            
+            if os.path.isdir(file_path):
+                dirs_stack.append(file_path)
+            else:
+                files_list.append(file_path)
+        
+    return files_list
+
+
 if __name__ == "__main__":
     # Simple tests
     
