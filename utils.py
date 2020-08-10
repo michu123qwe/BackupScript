@@ -8,6 +8,7 @@ def colored(string, color):
         green
         red
         yellow
+        blue
 
     Args:
         string (str): text to be printed,
@@ -20,7 +21,8 @@ def colored(string, color):
     colors = {
         'green': '\033[92m',
         'red': '\033[91m',
-        'yellow': '\033[93m'
+        'yellow': '\033[93m',
+        'blue': '\033[94m',
     }
     end_color = '\033[0m'
     
@@ -100,9 +102,10 @@ def get_list_of_filepaths(dirpath):
 if __name__ == "__main__":
     # Simple tests
     
-    colored('test', 'green')
-    colored('test', 'red')
-    colored('test', 'yellow')
+    colored('test\n', 'green')
+    colored('test\n', 'red')
+    colored('test\n', 'yellow')
+    colored('test\n', 'blue')
     
     try:
         colored('test', 'black')
