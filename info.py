@@ -38,10 +38,10 @@ def print_list_of_files_to_backup(filepaths_list):
 # print how many bytes of data is to be copied/moved
 def print_size_state(current_size, final_size):
     ratio = (current_size/final_size) * 100
-    current = format_size(current_size)
-    final = format_size(final_size)
+    current = utils.format_size(current_size)
+    final = utils.format_size(final_size)
     
     utils.colored(current, 'blue')
     print(' of ', end='')
     utils.colored(final, 'blue')
-    utils.colored(f' {ratio}\n', 'blue')
+    utils.colored(f' {ratio}%\n', 'blue')
