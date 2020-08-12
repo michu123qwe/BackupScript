@@ -11,29 +11,40 @@ def print_proceed_info():
     utils.colored(') ', 'blue')
 
 
-def print_filepath_to_backup(filepath):
-    size_formatted = utils.format_size(os.path.getsize(filepath))
+def print_filepath_to_backup(filepath, size):
+    size_formatted = utils.format_size(size)
     utils.colored(f'{filepath} ', 'green')
     utils.colored(f'{size_formatted}\n', 'blue')
 
 
-def print_list_of_files_to_backup(filepaths_list):
-    files_limit = 50
-    size_sum = utils.format_size(
-        sum([os.path.getsize(path) for path in filepaths_list]))
+def print_list_of_files(files_to_print, sizes_of_files, files_to_print_limit):
     
-    for i in range(min(files_limit, len(filepaths_list))):
-        print_filepath_to_backup(filepaths_list[i])
+    for i in range(min(len(files_to_print), files_to_print_limit)):
+        print_filepath_to_backup(files_to_print[i], sizes_of_files[i])
     
-    if len(filepaths_list) > files_limit:
-        remaining = len(filepaths_list) - files_limit
+    if len(files_to_print) > files_to_print_limit:
+        remaining = len(files_to_print) - files_to_print_limit
         utils.colored(f'...and ', 'green')    
         utils.colored(f'{remaining} ', 'blue')    
-        utils.colored(f'more.\n', 'green')    
+        utils.colored(f'more.\n', 'green')
     
+    size_sum = sum(sizes_of_files)
     utils.colored(f'Size: ', 'green')
     utils.colored(f'{size_sum}\n', 'blue')
     
+
+def print_list_of_files_to_backup(filepaths_list):
+    files_limit = 50
+    sizes_of_files = [os.path.getsize(filepath) for filepath in filepaths_list]
+    
+    print_list_of_files(filepaths_list, sizes_of_files, files_limit)
+    
+
+def print_relative_list_of_files_to_backup(relative_filepaths_list, dirpath):
+    files_limit = 50
+    sizes_of_files = [os.path.getsize(os.path.join(dirpath, filepath)) for filepath in relative_filepaths_list]
+    
+    print_list_of_files(relative_filepaths_list, sizes_of_files, files_limit)
     
 # print how many bytes of data is to be copied/moved
 def print_size_state(current_size, final_size):
