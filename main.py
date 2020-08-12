@@ -32,32 +32,53 @@ def parse_arguments():
 
 
 def make_backup(original_dirpath, backup_dirpath):
-    relative_paths = utils.get_list_of_relative_filepaths(original_dirpath)
+    """Perform backup.
     
-    original_filepaths = [os.path.join(original_dirpath, path) for path in relative_paths]
-    backup_filepaths = [os.path.join(backup_dirpath, path) for path in relative_paths]
+    Main backup function. It lists all files to be copied, asks for
+    consent to perform backup, and copies all files to backup_dirpath
+    preserving the same file and directory tree.
+
+    Args:
+        original_dirpath (str): path to directory with files to back-up,
+        backup_dirpath (str): path to directory to save files.
+
+    Returns:
+        bool: True if backup was performed without errors, False if 
+              there was not consent to perform back-up.
+    """
+    
+    relative_filepaths = utils.get_list_of_relative_filepaths(original_dirpath)
+    original_filepaths = [os.path.join(original_dirpath, path) for path in relative_filepaths]
+    backup_filepaths = [os.path.join(backup_dirpath, path) for path in relative_filepaths]
     
     # Print files that will be backed up.
-    info.print_list_of_files_to_backup(original_filepaths)
+    info.print_relative_list_of_files_to_backup(relative_filepaths, original_dirpath)
     
     # Print proceed info and get consent from user to back up files.
     info.print_proceed_info()
     answer = input()
     
     if answer.lower() == 'y':
-        current_size = 0
-        size_sum = sum([os.path.getsize(path) for path in original_filepaths])
+        size_of_copied_files = 0
+        size_of_all_files = sum([os.path.getsize(path) for path in original_filepaths])
         
-        for original_path, backup_path in zip(original_filepaths, backup_filepaths):
+        for i in range(len(original_filepaths)):
+            backup_path = backup_filepaths[i]
+            original_path = original_filepaths[i]
+            relative_path = relative_filepaths[i]
+            
             # Create needed directories for this file.
             if not os.path.exists(os.path.dirname(backup_path)):
                 os.makedirs(os.path.dirname(backup_path))
             
             backup.backup_file(original_path, backup_path)
             
-            current_size += os.path.getsize(original_path)
-            print(f'{original_path} saved! ', end='')
-            info.print_size_state(current_size, size_sum)
+            size_of_copied_files += os.path.getsize(original_path)
+            size_state = info.formatted_size_state(size_of_copied_files, 
+                                                   size_of_all_files)
+            
+            utils.clear_terminal()
+            print(f'{size_state}\n{relative_path} saved!')
             
         return True
     else:
