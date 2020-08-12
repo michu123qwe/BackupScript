@@ -39,21 +39,38 @@ def colored(string, color):
     return f'{colors[color]}{string}{end_color}'
 
 
-# return string with formatted size(B, KB, MB, GB)
 def format_size(size_in_bytes):
+    """Return string with formatted size (B, KB, MB, GB)
+    and 3 floating point numbers.
+
+    Args:
+        size_in_bytes (Union[int, float]): size to format.
+
+    Returns:
+        (str): formatted size.
+    """
+    
     if size_in_bytes < 1000:
-        return "{:.3f}B".format(size_in_bytes)
+        return '{:.3f}B'.format(size_in_bytes)
     elif size_in_bytes < 1000000:
-        return "{:.3f}KB".format(size_in_bytes / 1000)
+        return '{:.3f}KB'.format(size_in_bytes / 1000)
     elif size_in_bytes < 1000000000:
-        return "{:.3f}MB".format(size_in_bytes / 1000000)
+        return '{:.3f}MB'.format(size_in_bytes / 1000000)
     else:
-        return "{:.3f}GB".format(size_in_bytes / 1000000000)
+        return '{:.3f}GB'.format(size_in_bytes / 1000000000)
 
 
-# returns list of all relative filepaths in given
-# directory and its subdirectories.
 def get_list_of_relative_filepaths(dirpath):
+    """Return list of all relative filepaths in 
+    given dirpath.
+
+    Args:
+        dirpath (str): Path to directory with files to list.
+
+    Returns:
+        List[str]: List with relative filepaths.
+    """
+    
     # First element is empty, because first relative path
     # is basically path given in dirpath argument.
     relative_dirs_stack = ['']
