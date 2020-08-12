@@ -55,18 +55,6 @@ def print_relative_list_of_files_to_backup(relative_filepaths_list, dirpath):
     
     print_list_of_files(relative_filepaths_list, sizes_of_files, files_limit)
     
-# print how many bytes of data is to be copied/moved
-def print_size_state(current_size, final_size):
-    ratio = (current_size/final_size) * 100
-    current = format_size(current_size)
-    final = format_size(final_size)
-    
-    print(
-        colored(current, 'blue'),
-        'of',
-        colored(final, 'blue'),
-        colored(f'({ratio}%)', 'green')
-    )
 
 # return how many data is already copied.
 def formatted_size_state(current_size, final_size):

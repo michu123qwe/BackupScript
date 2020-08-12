@@ -108,33 +108,3 @@ def backup_file(original_filepath, backup_filepath):
         os.remove(backup_filepath)
 
     shutil.copyfile(original_filepath, backup_filepath)
-
-
-def backup_directory(original_dirpath, backup_dirpath):
-    """Backup all files and directories in original_dirpath and save 
-    them in backup_dirpath preserving the same file and directory tree. 
-
-    Args:
-        original_dirpath (str):     path to directory to be backed up,
-        backup_dirpath ([type]):    path to directory to which the copies
-                                    will be saved.
-    """
-    
-    if not os.path.isdir(original_dirpath):
-        # Original dir doesn't exist.
-        return None
-    
-    if not os.path.isdir(backup_dirpath):
-        # Backup dir doesn't exist, create it.
-        os.mkdir(backup_dirpath)
-        
-    original_files = os.listdir(original_dirpath)
-    
-    for original_file in original_files:
-        file_path = os.path.join(original_dirpath, original_file)
-        backup_file_path = os.path.join(backup_dirpath, original_file)
-        
-        if os.path.isdir(file_path):
-            backup_directory(file_path, backup_file_path)
-        else:
-            backup_file(file_path, backup_file_path)

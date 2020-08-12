@@ -51,39 +51,6 @@ def format_size(size_in_bytes):
         return "{:.3f}GB".format(size_in_bytes / 1000000000)
 
 
-# get size of directory
-def get_directory_size(start_path='.'):
-    total_size = 0
-    for dirpath, dirnames, filenames in os.walk(start_path):
-        for f in filenames:
-            fp = os.path.join(dirpath, f)
-            total_size += (os.path.getsize(fp) if os.path.isfile(fp) else 0)
-    return total_size
-
-
-# returns list of all filepaths in given directory and its
-# subdirectories
-def get_list_of_filepaths(dirpath):
-    dirs_stack = [dirpath]
-    files_list = []
-    
-    while dirs_stack:
-        # Pop the top of the stack with dirs.
-        current_dir = dirs_stack[-1]
-        del dirs_stack[-1]
-        
-        files_in_dir = os.listdir(current_dir)
-        for file in files_in_dir:
-            file_path = os.path.join(current_dir, file)
-            
-            if os.path.isdir(file_path):
-                dirs_stack.append(file_path)
-            else:
-                files_list.append(file_path)
-        
-    return files_list
-
-
 # returns list of all relative filepaths in given
 # directory and its subdirectories.
 def get_list_of_relative_filepaths(dirpath):
