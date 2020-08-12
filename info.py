@@ -1,20 +1,25 @@
 import os
 
-import utils
+from utils import format_size, colored
 
 
 def print_proceed_info():
-    utils.colored('\nProceed?(', 'blue')
-    utils.colored('y', 'green')
-    utils.colored('/', 'blue')
-    utils.colored('n', 'red')
-    utils.colored(') ', 'blue')
+    print(
+        colored('\nProceed?(', 'blue'),
+        colored('y', 'green'),
+        colored('/', 'blue'),
+        colored('n', 'red'),
+        colored(') ', 'blue'),
+        sep=''
+    )
 
 
 def print_filepath_to_backup(filepath, size):
-    size_formatted = utils.format_size(size)
-    utils.colored(f'{filepath} ', 'green')
-    utils.colored(f'{size_formatted}\n', 'blue')
+    size_formatted = format_size(size)
+    print(
+        colored(f'{filepath}', 'green'),
+        colored(f'{size_formatted}', 'blue')
+    )
 
 
 def print_list_of_files(files_to_print, sizes_of_files, files_to_print_limit):
@@ -24,13 +29,17 @@ def print_list_of_files(files_to_print, sizes_of_files, files_to_print_limit):
     
     if len(files_to_print) > files_to_print_limit:
         remaining = len(files_to_print) - files_to_print_limit
-        utils.colored(f'...and ', 'green')    
-        utils.colored(f'{remaining} ', 'blue')    
-        utils.colored(f'more.\n', 'green')
+        print(
+            colored(f'...and', 'green'),
+            colored(f'{remaining}', 'blue'),
+            colored(f'more.', 'green')
+        )
     
     size_sum = sum(sizes_of_files)
-    utils.colored(f'Size: ', 'green')
-    utils.colored(f'{size_sum}\n', 'blue')
+    print(
+        colored(f'Size:', 'green'),
+        colored(f'{size_sum}', 'blue')
+    )
     
 
 def print_list_of_files_to_backup(filepaths_list):
@@ -49,10 +58,14 @@ def print_relative_list_of_files_to_backup(relative_filepaths_list, dirpath):
 # print how many bytes of data is to be copied/moved
 def print_size_state(current_size, final_size):
     ratio = (current_size/final_size) * 100
-    current = utils.format_size(current_size)
-    final = utils.format_size(final_size)
+    current = format_size(current_size)
+    final = format_size(final_size)
     
-    utils.colored(current, 'blue')
-    print(' of ', end='')
-    utils.colored(final, 'blue')
-    utils.colored(f' {ratio}%\n', 'blue')
+    print(
+        colored(current, 'blue'),
+        'of',
+        colored(final, 'blue'),
+        colored(f'({ratio}%)', 'green')
+    )
+
+print_size_state(10, 100)
