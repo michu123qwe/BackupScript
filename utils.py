@@ -2,7 +2,7 @@ import os
 
 
 def colored(string, color):
-    """Print string in given available color.
+    """Return string in given available color.
     
     Available colors are:
         green
@@ -11,11 +11,14 @@ def colored(string, color):
         blue
 
     Args:
-        string (str): text to be printed,
+        string (str): text to be returned,
         color (str): color in which text will be printed.
 
     Raises:
         Exception: when given color is not one of the available colors.
+
+    Returns:
+        str: given text in desired color.
     """
     
     colors = {
@@ -29,9 +32,8 @@ def colored(string, color):
     if color not in colors.keys():
         raise Exception('Exception: No such color.')
     
-    print(colors[color], end='')
-    print(string, end='')
-    print(end_color, end='')
+    return f'{colors[color]}{string}{end_color}'
+
 
 # return string with formatted size(B, KB, MB, GB)
 def format_size(size_in_bytes):
@@ -109,10 +111,10 @@ def get_list_of_relative_filepaths(dirpath):
 if __name__ == "__main__":
     # Simple tests
     
-    colored('test\n', 'green')
-    colored('test\n', 'red')
-    colored('test\n', 'yellow')
-    colored('test\n', 'blue')
+    print(colored('test', 'green'))
+    print(colored('test', 'red'))
+    print(colored('test', 'yellow'))
+    print(colored('test', 'blue'))
     
     try:
         colored('test', 'black')
