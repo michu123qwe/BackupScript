@@ -35,7 +35,7 @@ def print_list_of_files(files_to_print, sizes_of_files, files_to_print_limit):
             colored(f'more.', 'green')
         )
     
-    size_sum = sum(sizes_of_files)
+    size_sum = format_size(sum(sizes_of_files))
     print(
         colored(f'Size:', 'green'),
         colored(f'{size_sum}', 'blue')
@@ -71,6 +71,7 @@ def print_size_state(current_size, final_size):
 # return how many data is already copied.
 def formatted_size_state(current_size, final_size):
     ratio = (current_size/final_size) * 100
+    ratio = colored(f'{ratio:.2f}', 'green')
     current = colored(format_size(current_size), 'blue')
     final = colored(format_size(final_size), 'blue')
     
