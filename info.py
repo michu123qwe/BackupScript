@@ -67,5 +67,3 @@ def print_size_state(current_size, final_size):
         colored(final, 'blue'),
         colored(f'({ratio}%)', 'green')
     )
-
-print_size_state(10, 100)
