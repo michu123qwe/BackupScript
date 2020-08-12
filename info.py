@@ -67,3 +67,11 @@ def print_size_state(current_size, final_size):
         colored(final, 'blue'),
         colored(f'({ratio}%)', 'green')
     )
+
+# return how many data is already copied.
+def formatted_size_state(current_size, final_size):
+    ratio = (current_size/final_size) * 100
+    current = colored(format_size(current_size), 'blue')
+    final = colored(format_size(final_size), 'blue')
+    
+    return f'{current} of {final} ({ratio}%)'
