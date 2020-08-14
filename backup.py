@@ -1,6 +1,6 @@
 import os
 import shutil
-import datetime
+from datetime import datetime
 
 import utils
 
@@ -37,6 +37,8 @@ def create_filename_for_old_version(backup_filepath):
     The old version filename is named as follows:
     {current_datetime}_{backup_filename}
     the final name is without curly brackets.
+    
+    Current datetime is in format: %Y-%m-%d_%H:%M:%S
 
     Args:
         backup_filepath (str): path to file.
@@ -46,7 +48,7 @@ def create_filename_for_old_version(backup_filepath):
     """
     
     backup_filename = os.path.split(backup_filepath)[-1]
-    now = str(datetime.datetime.now())
+    now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
     
     return f'{now}_{backup_filename}'
 
