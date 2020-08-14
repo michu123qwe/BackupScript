@@ -1,5 +1,6 @@
 import argparse
 import os
+import shutil
 
 import backup
 import utils
@@ -48,37 +49,44 @@ def make_backup(original_dirpath, backup_dirpath):
     """
     
     relative_filepaths = utils.get_list_of_relative_filepaths(original_dirpath)
-    original_filepaths = [os.path.join(original_dirpath, path) for path in relative_filepaths]
-    backup_filepaths = [os.path.join(backup_dirpath, path) for path in relative_filepaths]
+    backups = []
     
-    # Print files that will be backed up.
-    info.print_relative_list_of_files_to_backup(relative_filepaths, original_dirpath)
+    for rel_filepath in relative_filepaths:
+        original_filepath = os.path.join(original_dirpath, rel_filepath)
+        backup_filepath = os.path.join(backup_dirpath, rel_filepath)
+        old_version_dirpath = backup.get_dirpath_for_old_versions(backup_filepath)
+        old_version_filepath = os.path.join(old_version_dirpath, backup.get_filename_for_old_version(backup_filepath))
+        
+        backup_object = backup.SingleFileBackup(
+            original_filepath,
+            backup_filepath,
+            old_version_dirpath,
+            old_version_filepath
+        )
+        backups.append(backup_object)
     
-    # Print proceed info and get consent from user to back up files.
+    for i in range(min(len(backups), 50)):
+        print(backups[i])
+        
+    remaining = len(backups) - 50
+    if remaining > 0:
+        print(f'...and {remaining} more.')
+    
+    size_sum = sum([obj.get_size() for obj in backups])
+    print('Size:', utils.format_size(size_sum))
+    
     info.print_proceed_info()
     answer = input()
     
     if answer.lower() == 'y':
-        size_of_copied_files = 0
-        size_of_all_files = sum([os.path.getsize(path) for path in original_filepaths])
-        
-        for i in range(len(original_filepaths)):
-            backup_path = backup_filepaths[i]
-            original_path = original_filepaths[i]
-            relative_path = relative_filepaths[i]
+        size_copied = 0
+        for obj in backups:
+            obj.make_backup()
             
-            # Create needed directories for this file.
-            if not os.path.exists(os.path.dirname(backup_path)):
-                os.makedirs(os.path.dirname(backup_path))
-            
-            backup.backup_file(original_path, backup_path)
-            
-            size_of_copied_files += os.path.getsize(original_path)
-            size_state = info.formatted_size_state(size_of_copied_files, 
-                                                   size_of_all_files)
-            
+            size_copied += obj.get_size()
             utils.clear_terminal()
-            print(f'{size_state}\n{relative_path} saved!')
+            size_state = info.formatted_size_state(size_copied, size_sum)
+            print(f'{size_state}\n{obj.original_filepath} saved!')
             
         return True
     else:

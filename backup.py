@@ -5,7 +5,44 @@ from datetime import datetime
 import utils
 
 
-def create_dirpath_for_old_versions(filepath):
+class SingleFileBackup:
+    def __init__(self, original_filepath, backup_filepath, 
+                 old_version_dirpath, old_version_filepath):
+        self.original_filepath = original_filepath
+        self.backup_filepath = backup_filepath
+        self.old_version_dirpath = old_version_dirpath
+        self.old_version_filepath = old_version_filepath
+
+    def make_old_version(self):
+        if not os.path.isdir(self.old_version_dirpath):
+            os.makedirs(self.old_version_dirpath)
+                
+        shutil.copy(self.backup_filepath, self.old_version_filepath)
+
+    def make_backup(self):
+        if os.path.isfile(self.backup_filepath):
+             # File has been already saved, create old version for it.
+            self.make_old_version()
+        
+        backup_dirpath = os.path.dirname(self.backup_filepath)
+        if not os.path.isdir(backup_dirpath):
+            os.makedirs(backup_dirpath)
+        
+        shutil.copyfile(self.original_filepath, self.backup_filepath)
+        
+    def get_size(self):
+        return os.path.getsize(self.original_filepath)
+        
+    def __str__(self):
+        size_formatted = utils.format_size(
+            os.path.getsize(self.original_filepath))
+        filepath = utils.colored(self.original_filepath, 'green')
+        size_formatted = utils.colored(f'{size_formatted}', 'blue')
+        
+        return f'{filepath} {size_formatted}'
+
+
+def get_dirpath_for_old_versions(filepath):
     """Create directory path for old versions of file specified
     in filepath.
     
@@ -31,7 +68,7 @@ def create_dirpath_for_old_versions(filepath):
     return old_version_dirpath
 
 
-def create_filename_for_old_version(backup_filepath):
+def get_filename_for_old_version(backup_filepath):
     """Create filename for old version of backup_filepath.
     
     The old version filename is named as follows:
@@ -52,61 +89,3 @@ def create_filename_for_old_version(backup_filepath):
     
     return f'{now}_{backup_filename}'
 
-
-def create_directory_for_old_versions(filepath):
-    """Create directory for old versions of file in filepath if
-    it doesn't already exist.
-    
-
-    Args:
-        filepath (str): path to file.
-
-    Returns:
-        str: path to created directory for old versions.
-    """
-    
-    old_version_dirpath = create_dirpath_for_old_versions(filepath)
-    
-    if not os.path.isdir(old_version_dirpath):
-        os.mkdir(old_version_dirpath)
-        
-    return old_version_dirpath
-    
-
-def create_old_version_of_file(filepath):
-    """Create old version of file in filepath.
-    
-    Copy file in given filepath to directory with old versions
-    and give it proper old version name.
-
-    Args:
-        filepath (str): path to file.
-    """
-    
-    old_version_dirpath = create_directory_for_old_versions(filepath)
-    old_version_filename = create_filename_for_old_version(filepath)
-    old_version_filepath = os.path.join(old_version_dirpath, old_version_filename)
-    
-    shutil.copyfile(filepath, old_version_filepath)
-    
-
-def backup_file(original_filepath, backup_filepath):
-    """Create backup of file in original_filepath and save it
-    to backup_filepath and save older versions of file in
-    backup_filepath if this file has been already backed up.
-
-    Args:
-        original_filepath (str):    path to file to be backed up,
-        backup_filepath (str):      path to file to which the copy 
-                                    will be saved.
-    """
-    if not os.path.isfile(original_filepath):
-        # Original file doesn't exist.
-        return None
-    
-    if os.path.isfile(backup_filepath):
-        # Backup for this file already exists
-        create_old_version_of_file(backup_filepath)
-        os.remove(backup_filepath)
-
-    shutil.copyfile(original_filepath, backup_filepath)
