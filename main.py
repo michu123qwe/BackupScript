@@ -49,31 +49,11 @@ def make_backup(original_dirpath, backup_dirpath):
     """
     
     relative_filepaths = utils.get_list_of_relative_filepaths(original_dirpath)
-    backups = []
-    
-    for rel_filepath in relative_filepaths:
-        original_filepath = os.path.join(original_dirpath, rel_filepath)
-        backup_filepath = os.path.join(backup_dirpath, rel_filepath)
-        old_version_dirpath = backup.get_dirpath_for_old_versions(backup_filepath)
-        old_version_filepath = os.path.join(old_version_dirpath, backup.get_filename_for_old_version(backup_filepath))
-        
-        backup_object = backup.SingleFileBackup(
-            original_filepath,
-            backup_filepath,
-            old_version_dirpath,
-            old_version_filepath
-        )
-        backups.append(backup_object)
-    
-    for i in range(min(len(backups), 50)):
-        print(backups[i])
-        
-    remaining = len(backups) - 50
-    if remaining > 0:
-        print(f'...and {remaining} more.')
+    backups = backup.parse_backup_objects(
+        relative_filepaths, original_dirpath, backup_dirpath)
     
     size_sum = sum([obj.get_size() for obj in backups])
-    print('Size:', utils.format_size(size_sum))
+    info.print_backup_objects(backups, size_sum=size_sum, files_limit=50)
     
     info.print_proceed_info()
     answer = input()
@@ -81,12 +61,12 @@ def make_backup(original_dirpath, backup_dirpath):
     if answer.lower() == 'y':
         size_copied = 0
         for obj in backups:
-            obj.make_backup()
-            
-            size_copied += obj.get_size()
             utils.clear_terminal()
             size_state = info.formatted_size_state(size_copied, size_sum)
-            print(f'{size_state}\n{obj.original_filepath} saved!')
+            print(f'{size_state}\nCopying:\n{obj}')
+            
+            obj.make_backup()
+            size_copied += obj.get_size()
             
         return True
     else:

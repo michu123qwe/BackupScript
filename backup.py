@@ -6,6 +6,7 @@ import utils
 
 
 class SingleFileBackup:
+    # todo: docstrings and maybe refactor
     def __init__(self, original_filepath, backup_filepath, 
                  old_version_dirpath, old_version_filepath):
         self.original_filepath = original_filepath
@@ -40,6 +41,37 @@ class SingleFileBackup:
         size_formatted = utils.colored(f'{size_formatted}', 'blue')
         
         return f'{filepath} {size_formatted}'
+
+
+def parse_backup_objects(relative_filepaths, original_dirpath, backup_dirpath):
+    """Parse given paths to single-file backup objects.
+
+    Args:
+        relative_filepaths (str): relative paths to files to backup,
+        original_dirpath (str): path to directory with files to be copied,
+        backup_dirpath (str): path to directory to which save copied files.
+
+    Returns:
+        List[SingleFileBackup]: list of single-file backup objects.
+    """
+    
+    backup_objects = []
+    
+    for rel_filepath in relative_filepaths:
+        original_filepath = os.path.join(original_dirpath, rel_filepath)
+        backup_filepath = os.path.join(backup_dirpath, rel_filepath)
+        old_version_dirpath = get_dirpath_for_old_versions(backup_filepath)
+        old_version_filepath = os.path.join(old_version_dirpath, get_filename_for_old_version(backup_filepath))
+        
+        backup_object = SingleFileBackup(
+            original_filepath,
+            backup_filepath,
+            old_version_dirpath,
+            old_version_filepath
+        )
+        backup_objects.append(backup_object)
+    
+    return backup_objects
 
 
 def get_dirpath_for_old_versions(filepath):
@@ -88,4 +120,3 @@ def get_filename_for_old_version(backup_filepath):
     now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
     
     return f'{now}_{backup_filename}'
-

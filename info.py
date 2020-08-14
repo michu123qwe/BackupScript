@@ -2,6 +2,7 @@ import os
 
 from utils import format_size, colored
 
+# todo: look how many you use and maybe move them to utils
 
 def print_proceed_info():
     """Print info with question to proceed with backup.
@@ -30,6 +31,22 @@ def print_filepath_to_backup(filepath, size_in_bytes):
         colored(f'{filepath}', 'green'),
         colored(f'{size_formatted}', 'blue')
     )
+
+def print_backup_objects(backup_objects, size_sum=None, files_limit=None):
+    # todo docstring
+    
+    backup_objects_length = len(backup_objects)
+    files_limit = backup_objects_length if not files_limit else files_limit
+    
+    for i in range(min(backup_objects_length, files_limit)):
+        print(backup_objects[i])
+        
+    remaining = backup_objects_length - 50
+    if remaining > 0:
+        print(f'...and {remaining} more.')
+    
+    if size_sum:
+        print('Size:', format_size(size_sum))
 
 
 def print_list_of_files(files_to_print, sizes_of_files, files_to_print_limit):
