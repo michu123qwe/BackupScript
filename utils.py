@@ -39,6 +39,16 @@ def colored(string, color):
     return f'{colors[color]}{string}{end_color}'
 
 
+def print_test_ok(test_text):
+    """Print test text with green 'OK'.
+
+    Args:
+        test_text (str): test text.
+    """
+    
+    print(test_text, colored('OK', 'green'))
+
+
 def format_size(size_in_bytes):
     """Return string with formatted size (B, KB, MB, GB)
     and 3 floating point numbers.
