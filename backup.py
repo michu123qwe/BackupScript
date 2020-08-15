@@ -113,10 +113,10 @@ def get_dirpath_for_old_versions(filepath):
     
     The directory path is the same as filepath, except it is
     not path to file, but to directory named as follows: 
-    _old_{filepath without extension}
-    the final name is without curly brackets.
+    ./_old_/_old_{filename with replaced dots}
+    the final name is without curly brackets and dots in filename
+    are replaced with underscores(_).
     
-
     Args:
         filepath (str): path to file.
 
@@ -125,9 +125,12 @@ def get_dirpath_for_old_versions(filepath):
     """
     
     filename = os.path.split(filepath)[-1]
-    old_version_dirname = '_old_' + filename.split('.')[0]
+    old_versions_dirname = '_old_'
+    old_version_dirname = '_old_' + filename.replace('.', '_')
+    
     old_version_dirpath = os.path.join(
         os.path.dirname(filepath), 
+        old_versions_dirname,
         old_version_dirname)
     
     return old_version_dirpath
