@@ -6,21 +6,39 @@ import utils
 
 
 class SingleFileBackup:
-    # todo: docstrings and maybe refactor
+    """A single object of file to backup with all information
+    needed to make backup of this file:
+        -path of this file,
+        -path where to save this file,
+        -path where to save old version of backuped file.
+    """
+    
     def __init__(self, original_filepath, backup_filepath, 
-                 old_version_dirpath, old_version_filepath):
+                 old_version_filepath):
         self.original_filepath = original_filepath
         self.backup_filepath = backup_filepath
-        self.old_version_dirpath = old_version_dirpath
         self.old_version_filepath = old_version_filepath
 
     def make_old_version(self):
-        if not os.path.isdir(self.old_version_dirpath):
-            os.makedirs(self.old_version_dirpath)
+        """Make old version of file i.e copy file specified
+        in self.original_filepath to self.old_version_filepath and
+        create any required not existing directories.
+        """
+        
+        old_dirpath = self.get_old_version_dirpath()
+        if not os.path.isdir(old_dirpath):
+            os.makedirs(old_dirpath)
                 
         shutil.copy(self.backup_filepath, self.old_version_filepath)
 
     def make_backup(self):
+        """Make backup of file i.e create old version if
+        file was backuped before, copy file specified in 
+        self.original_filepath to path specified
+        in self.backup_filepath and create any required not 
+        existing directories.
+        """
+        
         if os.path.isfile(self.backup_filepath):
              # File has been already saved, create old version for it.
             self.make_old_version()
@@ -32,11 +50,26 @@ class SingleFileBackup:
         shutil.copyfile(self.original_filepath, self.backup_filepath)
         
     def get_size(self):
+        """Return size in bytes of file in self.original_filepath.
+
+        Returns:
+            int: size of file in bytes.
+        """
+
         return os.path.getsize(self.original_filepath)
+    
+    def get_old_version_dirpath(self):
+        """Return path of old version directory i.e
+        directory path of file specified in self.old_version_filepath.
+
+        Returns:
+            str: path of old version directory.
+        """
+        
+        return os.path.dirname(self.old_version_filepath)
         
     def __str__(self):
-        size_formatted = utils.format_size(
-            os.path.getsize(self.original_filepath))
+        size_formatted = utils.format_size(self.get_size())
         filepath = utils.colored(self.original_filepath, 'green')
         size_formatted = utils.colored(f'{size_formatted}', 'blue')
         
@@ -60,13 +93,13 @@ def parse_backup_objects(relative_filepaths, original_dirpath, backup_dirpath):
     for rel_filepath in relative_filepaths:
         original_filepath = os.path.join(original_dirpath, rel_filepath)
         backup_filepath = os.path.join(backup_dirpath, rel_filepath)
-        old_version_dirpath = get_dirpath_for_old_versions(backup_filepath)
-        old_version_filepath = os.path.join(old_version_dirpath, get_filename_for_old_version(backup_filepath))
+        old_version_filepath = os.path.join(
+            get_dirpath_for_old_versions(backup_filepath), 
+            get_filename_for_old_version(backup_filepath))
         
         backup_object = SingleFileBackup(
             original_filepath,
             backup_filepath,
-            old_version_dirpath,
             old_version_filepath
         )
         backup_objects.append(backup_object)
