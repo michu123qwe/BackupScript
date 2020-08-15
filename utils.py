@@ -106,6 +106,68 @@ def get_list_of_relative_filepaths(dirpath):
     return files_list
 
 
+def print_proceed_info():
+    """Print info with question to proceed with backup.
+    """
+    
+    print(
+        colored('\nProceed?(', 'blue'),
+        colored('y', 'green'),
+        colored('/', 'blue'),
+        colored('n', 'red'),
+        colored(') ', 'blue'),
+        sep=''
+    )
+
+
+def print_backup_objects(backup_objects, size_sum=None, files_limit=None):
+    """Print backup objects, limiting their number to files_limit
+    if specified and print size of all files if specified in size_sum.
+
+    Args:
+        backup_objects (List[SingleFileBackup]): list of backup objects
+                                                 to print.
+        size_sum (int, optional): Sum of sizes of all files in backup 
+                                  objects. Defaults to None.
+        files_limit (int, optional): Limit of how many backup objects to
+                                     print. Defaults to None.
+    """
+    
+    backup_objects_length = len(backup_objects)
+    files_limit = backup_objects_length if not files_limit else files_limit
+    
+    for i in range(min(backup_objects_length, files_limit)):
+        print(backup_objects[i])
+        
+    remaining = backup_objects_length - 50
+    if remaining > 0:
+        print(f'...and {remaining} more.')
+    
+    if size_sum:
+        print('Size:', format_size(size_sum))
+    
+
+def formatted_size_state(current_size, final_size):
+    """Return formatted information of how much data
+    is already copied.
+
+    Args:
+        current_size (Union[int, float]): current size of data,
+        final_size (Union[int, float]): final size of data.
+
+    Returns:
+        str: formatted information of how much data
+             is already copied.
+    """
+    
+    ratio = (current_size/final_size) * 100
+    ratio = colored(f'{ratio:.2f}', 'green')
+    current = colored(format_size(current_size), 'blue')
+    final = colored(format_size(final_size), 'blue')
+    
+    return f'{current} of {final} ({ratio}%)'
+
+
 if __name__ == "__main__":
     # Simple tests
     

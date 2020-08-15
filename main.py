@@ -4,7 +4,6 @@ import shutil
 
 import backup
 import utils
-import info
 
 
 def parse_arguments():
@@ -53,16 +52,16 @@ def make_backup(original_dirpath, backup_dirpath):
         relative_filepaths, original_dirpath, backup_dirpath)
     
     size_sum = sum([obj.get_size() for obj in backups])
-    info.print_backup_objects(backups, size_sum=size_sum, files_limit=50)
+    utils.print_backup_objects(backups, size_sum=size_sum, files_limit=50)
     
-    info.print_proceed_info()
+    utils.print_proceed_info()
     answer = input()
     
     if answer.lower() == 'y':
         size_copied = 0
         for obj in backups:
             utils.clear_terminal()
-            size_state = info.formatted_size_state(size_copied, size_sum)
+            size_state = utils.formatted_size_state(size_copied, size_sum)
             print(f'{size_state}\nCopying:\n{obj}')
             
             obj.make_backup()
