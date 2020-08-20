@@ -95,5 +95,7 @@ if __name__ == "__main__":
     ]
     
     for idx, test in enumerate(tests_to_run):
+        print('*'*50)
         print(f'Test #{idx}:')
+        print('*'*50)
         test()
