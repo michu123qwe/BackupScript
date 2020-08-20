@@ -156,33 +156,3 @@ def formatted_size_state(current_size, final_size):
     final = colored(format_size(final_size), 'blue')
     
     return f'{current} of {final} ({ratio}%)'
-
-
-if __name__ == "__main__":
-    # Simple tests
-    
-    # Clear terminal.
-    print('You should not see this.')
-    clear_terminal()
-    print('If this is first line, clear terminal test passed.')
-    
-    # Print colored text.
-    print(colored('green', 'green'))
-    print(colored('red', 'red'))
-    print(colored('yellow', 'yellow'))
-    print(colored('blue', 'blue'))
-    
-    try:
-        colored('test', 'black')
-    except Exception as e:
-        print(e)
-        
-    # Size formatting
-    sizes = [5, 50, 500, 5000, 50000, 500000, 5000000, 5000000000]
-    answers = ['5.000B', '50.000B', '500.000B', '5.000KB', 
-               '50.000KB', '500.000KB', '5.000MB', '5.000GB']
-    for size, answer in zip(sizes, answers):
-        formatted = format_size(size)
-        assert formatted == answer
-        
-        print(f'{formatted}', colored('OK', 'green'))
