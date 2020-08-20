@@ -101,7 +101,7 @@ def print_proceed_info():
     """
     
     print(
-        colored('\nProceed?(', 'blue'),
+        colored('Proceed?(', 'blue'),
         colored('y', 'green'),
         colored('/', 'blue'),
         colored('n', 'red'),
