@@ -1,7 +1,44 @@
 from unittest import TestCase
 import os
+from datetime import datetime
 
 from utils import format_size, get_list_of_relative_filepaths
+from backup import (
+    get_dirpath_for_old_versions,
+    get_filename_for_old_version,
+) 
+
+
+class BackupTests(TestCase):
+    """Tests for backup.py module
+    """
+    
+    def test_get_dirpath_for_old_versions(self):
+        test_filepaths = [
+            '/home/user/file.txt', # Simple file.
+            '/home/user/file.with.comma.py', # File with multiple commas.
+            '/home/user/.gitignore', # File starting with comma.
+        ]
+        answers = [
+            '/home/user/_old_/_old_file_txt',
+            '/home/user/_old_/_old_file_with_comma_py',
+            '/home/user/_old_/_old__gitignore',
+        ]
+        
+        for filepath, answer in zip(test_filepaths, answers):
+            result = get_dirpath_for_old_versions(filepath)
+            self.assertEqual(result, answer)
+            
+    def test_get_filename_for_old_version(self):  
+        filename = 'file.txt'
+        result = get_filename_for_old_version(filename)
+        now = datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
+        answer = f'{now}_{filename}'
+        
+        # Both answer and result use datetime.now() called in different
+        # moments, but the test is so short that the answer should be 
+        # the same, because it is with accuracy of a second.
+        self.assertEqual(result, answer)
 
 
 class UtilsTests(TestCase):
