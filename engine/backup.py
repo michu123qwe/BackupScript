@@ -1,8 +1,10 @@
 import os
 import shutil
 from datetime import datetime
+import sys
 
-from . import utils
+sys.path.append(os.path.dirname(__file__))
+import utils
 
 
 class SingleFileBackup:

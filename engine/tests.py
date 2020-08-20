@@ -1,9 +1,11 @@
 from unittest import TestCase
 import os
 from datetime import datetime
+import sys
 
-from .utils import format_size, get_list_of_relative_filepaths
-from .backup import (
+sys.path.append(os.path.dirname(__file__))
+from utils import format_size, get_list_of_relative_filepaths
+from backup import (
     get_dirpath_for_old_versions,
     get_filename_for_old_version,
 ) 
