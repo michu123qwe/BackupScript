@@ -66,7 +66,11 @@ def make_backup(original_dirpath, backup_dirpath):
             
             obj.make_backup()
             size_copied += obj.get_size()
-            
+        
+        utils.clear_terminal()
+        print(utils.formatted_size_state(size_copied, size_sum))
+        print(utils.colored('Backup finished!', 'green'))
+        
         return True
     else:
         return False
