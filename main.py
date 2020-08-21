@@ -75,7 +75,11 @@ def make_backup(original_dirpath, backup_dirpath):
 if __name__ == "__main__":
     original_dirpath, backup_dirpath = parse_arguments()
     
-    assert os.path.isdir(original_dirpath)
+    if not os.path.isdir(original_dirpath):
+        # Given original_dirpath argument is not a directory.
+        print(utils.colored('First argument is not a directory.', 'red'))
+        quit()
+
     if not os.path.isdir(backup_dirpath):
         # Backup dir doesn't exist, create it.
         os.mkdir(backup_dirpath)
