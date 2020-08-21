@@ -20,6 +20,9 @@ class SingleFileBackup:
         self.original_filepath = original_filepath
         self.backup_filepath = backup_filepath
         self.old_version_filepath = old_version_filepath
+        
+        if not os.path.isfile(self.original_filepath):
+            raise IOError('original_filepath is not valid filepath.')
 
     def make_old_version(self):
         """Make old version of file i.e copy file specified
