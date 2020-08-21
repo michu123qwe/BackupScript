@@ -82,6 +82,14 @@ if __name__ == "__main__":
 
     if not os.path.isdir(backup_dirpath):
         # Backup dir doesn't exist, create it.
-        os.mkdir(backup_dirpath)
+        try:
+            os.mkdir(backup_dirpath)
+        except PermissionError as e:
+            # User doesn't have permission to use this directory.
+            print(
+                utils.colored(
+                    f'{backup_dirpath}: Cannot use this directory for backup.', 
+                    'red'))
+            quit()
     
     make_backup(original_dirpath, backup_dirpath)
