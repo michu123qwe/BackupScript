@@ -106,7 +106,8 @@ def print_proceed_info():
         colored('/', 'blue'),
         colored('n', 'red'),
         colored(') ', 'blue'),
-        sep=''
+        sep='',
+        end=' '
     )
 
 
