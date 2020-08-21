@@ -157,3 +157,12 @@ def formatted_size_state(current_size, final_size):
     final = colored(format_size(final_size), 'blue')
     
     return f'{current} of {final} ({ratio}%)'
+
+def quit_with_error(text):
+    """Quit programme printing given text in red.
+
+    Args:
+        text (str): error text.
+    """
+    print(colored(text, 'red'))
+    quit()

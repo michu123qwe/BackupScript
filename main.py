@@ -77,19 +77,22 @@ if __name__ == "__main__":
     
     if not os.path.isdir(original_dirpath):
         # Given original_dirpath argument is not a directory.
-        print(utils.colored('First argument is not a directory.', 'red'))
-        quit()
+        utils.quit_with_error('First argument is not a directory.')
 
+    if not os.access(original_dirpath, os.W_OK):
+        # User doesn't have permission to use given original_dirpath.
+        utils.quit_with_error(f'Permission denied for: {original_dirpath}')
+    
     if not os.path.isdir(backup_dirpath):
-        # Backup dir doesn't exist, create it.
+        # Backup directory doesn't exist, create it.
         try:
             os.mkdir(backup_dirpath)
         except PermissionError as e:
-            # User doesn't have permission to use this directory.
-            print(
-                utils.colored(
-                    f'{backup_dirpath}: Cannot use this directory for backup.', 
-                    'red'))
-            quit()
+            # User doesn't have permission to use given backup_dirpath.
+            utils.quit_with_error(f'Permission denied for: {backup_dirpath}')
+            
+    if not os.access(backup_dirpath, os.W_OK):
+        # User doesn't have permission to use given backup_dirpath.
+        utils.quit_with_error(f'Permission denied for: {backup_dirpath}')
     
     make_backup(original_dirpath, backup_dirpath)
