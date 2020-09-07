@@ -1,16 +1,22 @@
 # BackupScript
 
 Script to back-up files.
-Created on Ubuntu.
 Currently working on Ubuntu, I haven't checked other os.
-Currently types of errors aren't handled, files that can't be copied are skipped.
+
+The script takes two paths: path to directory with files to back-up and path to directory where files will be copied. Then, after user's consent, script performs back-up.
+
+If script is run two or more times on the same directories, it will create directories for older versions of previously saved files.  
+For example:  
+**/home/user/file.txt** is saved in **/home/user/backup/file.txt**  
+Script runs again, current **/home/user/file.txt** is again saved in **/home/user/backup/file.txt** but the previous version of **/home/user/backup/file.txt** is moved to **/home/user/backup/_old_/_old_file_txt/2020-09-07_12:00:00_file.txt** (the datetime is equal to current datetime while performing back-up).
+
+**Python 3** is needed to run this script.
 
 Usage:
-1. Create folder to keep files for back-up.
+1. Enter main directory of this repository.
 2. Open terminal.
-2. Enter virtual environment: "source /path/to/venv/bin/activate"
-3. Run script: "/path/to/script/main.py /path/to/backup/folder /path/to/folder/to/be/backed/up"
-4. List of files/folders to be moved/copied/created will be shown. If you accept it, type "y".
-5. Files/directories will be copied/moved/created as listed.
+3. Run script: python3 main.py path_to_dir_with_files path_to_dir_where_files_will_be_copied
+4. Follow instructions in terminal.
 
-**Script is not well tested. Use at your own risk.**
+
+**Use at your own risk.**

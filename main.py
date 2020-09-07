@@ -1,58 +1,102 @@
-import os
-import backup
-import utils.utils as utils
 import argparse
+import os
+import shutil
+
+from engine import utils
+from engine import backup
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("backup_folder", type=str, help="Folder with backup files")
-parser.add_argument("new_folder", type=str, help="Folder with files to be backed up")
-args = parser.parse_args()
+def parse_arguments():
+    """Parse arguments from console.
+    
+    Parse two arguments from console, original directory and
+    backup directory paths and return them.
 
-BACKUPPATH = args.backup_folder
-NEWPATH = args.new_folder
-
-# try to open backup folder
-if not os.path.isdir(BACKUPPATH):
-    print("Cannot open {}".format(BACKUPPATH))
-    input("Click enter to exit...")
-    quit()
-
-# try to open new folder
-if not os.path.isdir(NEWPATH):
-    print("Cannot open {}".format(NEWPATH))
-    input("Click enter to exit...")
-    quit()
-
-files_new, files_different, files_move, files_directory = backup.list_backup(BACKUPPATH, NEWPATH)
-
-if len(files_new) + len(files_directory) + len(files_move) + len(files_different) == 0:
-    print("Backup folder is up to date.")
-    input("Click enter to exit...")
-    quit()
-
-if len(files_new) > 0:
-    print("\nNew files:")
-    utils.print_files_list(files_new)
-
-if len(files_directory) > 0:
-    print("\nFolders for old versions:")
-    for path in files_directory:
-        print("Create {}".format(path))
-
-if len(files_move) > 0:
-    print("\nMove old versions:")
-    utils.print_files_list(files_move)
-
-if len(files_different) > 0:
-    print("\nDifferent files:")
-    utils.print_files_list(files_different)
-
-ans = input("\nProceed?(y/n) ")
-if ans.lower() == "y":
-    backup.make_backup(files_new, files_different, files_directory, files_move)
-else:
-    print("Goodbye")
-    quit()
+    Returns:
+        Tuple(str): tuple consisting of original directory and
+                    backup directory paths.
+    """
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "original_directory", 
+        type=str, 
+        help="Path to directory with files to back up.")
+    parser.add_argument(
+        "backup_directory", 
+        type=str, 
+        help="Path to directory to which save backed up files.")
+    args = parser.parse_args()
+    
+    return args.original_directory, args.backup_directory
 
 
+def make_backup(original_dirpath, backup_dirpath):
+    """Perform backup.
+    
+    Main backup function. It lists all files to be copied, asks for
+    consent to perform backup, and copies all files to backup_dirpath
+    preserving the same file and directory tree.
+
+    Args:
+        original_dirpath (str): path to directory with files to back-up,
+        backup_dirpath (str): path to directory to save files.
+
+    Returns:
+        bool: True if backup was performed without errors, False if 
+              there was not consent to perform back-up.
+    """
+    
+    relative_filepaths = utils.get_list_of_relative_filepaths(original_dirpath)
+    backups = backup.parse_backup_objects(
+        relative_filepaths, original_dirpath, backup_dirpath)
+    
+    size_sum = sum([obj.get_size() for obj in backups])
+    utils.print_backup_objects(backups, size_sum=size_sum, files_limit=50)
+    
+    utils.print_proceed_info()
+    answer = input()
+    
+    if answer.lower() == 'y':
+        size_copied = 0
+        for obj in backups:
+            utils.clear_terminal()
+            size_state = utils.formatted_size_state(size_copied, size_sum)
+            print(f'{size_state}\nCopying:\n{obj}')
+            
+            obj.make_backup()
+            size_copied += obj.get_size()
+        
+        utils.clear_terminal()
+        print(utils.formatted_size_state(size_copied, size_sum))
+        print(utils.colored('Backup finished!', 'green'))
+        
+        return True
+    else:
+        return False
+    
+
+if __name__ == "__main__":
+    original_dirpath, backup_dirpath = parse_arguments()
+    
+    if not os.path.isdir(original_dirpath):
+        # Given original_dirpath argument is not a directory.
+        utils.quit_with_error('First argument is not a directory.')
+
+    if not os.access(original_dirpath, os.W_OK):
+        # User doesn't have permission to use given original_dirpath.
+        utils.quit_with_error(f'Permission denied for: {original_dirpath}')
+    
+    if not os.path.isdir(backup_dirpath):
+        # Backup directory doesn't exist, create it.
+        try:
+            os.mkdir(backup_dirpath)
+        except PermissionError as e:
+            # User doesn't have permission to use given backup_dirpath.
+            utils.quit_with_error(f'Permission denied for: {backup_dirpath}')
+            
+    if not os.access(backup_dirpath, os.W_OK):
+        # User doesn't have permission to use given backup_dirpath.
+        utils.quit_with_error(f'Permission denied for: {backup_dirpath}')
+    
+    make_backup(original_dirpath, backup_dirpath)
