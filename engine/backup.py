@@ -81,7 +81,7 @@ class SingleFileBackup:
         return f'{filepath} {size_formatted}'
 
 
-def parse_backup_objects(relative_filepaths, original_dirpath, backup_dirpath):
+def parse_backup_objects(original_dirpath, backup_dirpath):
     """Parse given paths to single-file backup objects.
 
     Args:
@@ -94,6 +94,7 @@ def parse_backup_objects(relative_filepaths, original_dirpath, backup_dirpath):
     """
     
     backup_objects = []
+    relative_filepaths = utils.get_list_of_relative_filepaths(original_dirpath)
     
     for rel_filepath in relative_filepaths:
         original_filepath = os.path.join(original_dirpath, rel_filepath)
