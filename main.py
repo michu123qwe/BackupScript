@@ -1,102 +1,113 @@
+from typing import List, Tuple
+from datetime import datetime
 import argparse
 import os
 import shutil
 
-from engine import utils
-from engine import backup
+from utils import (
+    quit_with_error,
+    get_list_of_relative_filepaths
+)
+
+
+OLD_FILE_DIRECTORY = '_old_'
 
 
 def parse_arguments():
     """Parse arguments from console.
-    
-    Parse two arguments from console, original directory and
-    backup directory paths and return them.
+
+    Parse two arguments from console, source directory and
+    destination directory paths and return them.
 
     Returns:
-        Tuple(str): tuple consisting of original directory and
-                    backup directory paths.
+        Tuple(str): tuple consisting of source directory and
+                    destination directory paths.
     """
-    
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "original_directory", 
-        type=str, 
+        "src_dir",
+        type=str,
         help="Path to directory with files to back up.")
     parser.add_argument(
-        "backup_directory", 
-        type=str, 
+        "dst_dir",
+        type=str,
         help="Path to directory to which save backed up files.")
     args = parser.parse_args()
-    
-    return args.original_directory, args.backup_directory
+
+    return args.src_dir, args.dst_dir
 
 
-def make_backup(original_dirpath, backup_dirpath):
-    """Perform backup.
-    
-    Main backup function. It lists all files to be copied, asks for
-    consent to perform backup, and copies all files to backup_dirpath
-    preserving the same file and directory tree.
+def make_old_filepath(filepath):
+    dirpath = os.path.dirname(filepath)
+    filename = os.path.split(filepath)[-1]
+    now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 
-    Args:
-        original_dirpath (str): path to directory with files to back-up,
-        backup_dirpath (str): path to directory to save files.
+    old_filename = f'{now}_{filename}'
+    old_filepath = os.path.join(dirpath, OLD_FILE_DIRECTORY, old_filename)
 
-    Returns:
-        bool: True if backup was performed without errors, False if 
-              there was not consent to perform back-up.
-    """
-    
-    relative_filepaths = utils.get_list_of_relative_filepaths(original_dirpath)
-    backups = backup.parse_backup_objects(
-        relative_filepaths, original_dirpath, backup_dirpath)
-    
-    size_sum = sum([obj.get_size() for obj in backups])
-    utils.print_backup_objects(backups, size_sum=size_sum, files_limit=50)
-    
-    utils.print_proceed_info()
-    answer = input()
-    
-    if answer.lower() == 'y':
-        size_copied = 0
-        for obj in backups:
-            utils.clear_terminal()
-            size_state = utils.formatted_size_state(size_copied, size_sum)
-            print(f'{size_state}\nCopying:\n{obj}')
-            
-            obj.make_backup()
-            size_copied += obj.get_size()
-        
-        utils.clear_terminal()
-        print(utils.formatted_size_state(size_copied, size_sum))
-        print(utils.colored('Backup finished!', 'green'))
-        
-        return True
-    else:
-        return False
-    
+    return old_filepath
+
+
+def copy_file(src: str, dst: str):
+    if not os.path.isdir(dirpath := os.path.dirname(dst)):
+        os.makedirs(dirpath)
+
+    try:
+        shutil.copy2(src, dst)
+    except FileNotFoundError as fnfe:
+        print(fnfe)
+        input('Press enter to skip...')
+    except PermissionError as pe:
+        print(pe)
+        input('Press enter to skip...')
+
+
+def make_backup(copy_from_dir: List[str],
+                copy_to_dir: List[str],
+                keep_existing: bool = False) -> None:
+    relative_filepaths = get_list_of_relative_filepaths(copy_from_dir)
+
+    if keep_existing:
+        for rel_path in relative_filepaths:
+            src = os.path.join(copy_to_dir, rel_path)
+            dst = os.path.join(copy_to_dir, make_old_filepath(rel_path))
+
+            if os.path.isfile(src):
+                print(f'from {src} to {dst}')
+                copy_file(src, dst)
+
+    for rel_path in relative_filepaths:
+        src = os.path.join(copy_from_dir, rel_path)
+        dst = os.path.join(copy_to_dir, rel_path)
+
+        print(f'from {src} to {dst}')
+        copy_file(src, dst)
+
+
+def check_dirs(src: str, dst: str):
+    if not os.path.isdir(src):
+        quit_with_error('Source directory does not exist.')
+
+    if not os.access(src, os.W_OK):
+        quit_with_error(f'Permission denied for: {src}')
+
+    if not os.access(dst, os.W_OK):
+        quit_with_error(f'Permission denied for: {dst}')
+
+
+def create_dst_dir(dst: str):
+    if not os.path.isdir(dst):
+        try:
+            os.mkdir(dst)
+        except PermissionError as e:
+            quit_with_error(f'Permission denied for: {dst}')
+
 
 if __name__ == "__main__":
-    original_dirpath, backup_dirpath = parse_arguments()
-    
-    if not os.path.isdir(original_dirpath):
-        # Given original_dirpath argument is not a directory.
-        utils.quit_with_error('First argument is not a directory.')
+    src_dir, dst_dir = parse_arguments()
 
-    if not os.access(original_dirpath, os.W_OK):
-        # User doesn't have permission to use given original_dirpath.
-        utils.quit_with_error(f'Permission denied for: {original_dirpath}')
-    
-    if not os.path.isdir(backup_dirpath):
-        # Backup directory doesn't exist, create it.
-        try:
-            os.mkdir(backup_dirpath)
-        except PermissionError as e:
-            # User doesn't have permission to use given backup_dirpath.
-            utils.quit_with_error(f'Permission denied for: {backup_dirpath}')
-            
-    if not os.access(backup_dirpath, os.W_OK):
-        # User doesn't have permission to use given backup_dirpath.
-        utils.quit_with_error(f'Permission denied for: {backup_dirpath}')
-    
-    make_backup(original_dirpath, backup_dirpath)
+    create_dst_dir(dst_dir)
+    check_dirs(src_dir, dst_dir)
+
+    make_backup(src_dir, dst_dir, True)
